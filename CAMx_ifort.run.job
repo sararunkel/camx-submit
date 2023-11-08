@@ -7,40 +7,48 @@ setenv NCPUS 4
 setenv OMP_NUM_THREADS 4
 setenv OMP_STACKSIZE 128M
 limit stacksize unlimited
-
+set formatted_date = `date +%y%m%d`
 set EXEC      = "/GWSPH/groups/anenberggrp/camx_mpi/CAMxv7.20/CAMx.v7.20.MPICH3.NCF4.ifort"
 #
 set RUN     = "v7.20.36.12"
-set ICBC    = "/lustre/groups/anenberggrp/VAS/adam_camx/BCON_proc/BCON_proc"
-set INPUT   = "/lustre/groups/anenberggrp/VAS/adam_camx/inputs"
+set ICBC    = "/GWSPH/groups/anenberggrp/camx_mpi/nyc/BCON_proc"
+set INPUT   = "/GWSPH/groups/anenberggrp/camx_mpi/nyc/inputs"
+set OZCOL   = "/GWSPH/groups/anenberggrp/camx_mpi/nyc/o3_map"
 set TUV     = "/GWSPH/groups/anenberggrp/camx_mpi/nyc/tuv_p"
-set MET     = "/lustre/groups/anenberggrp/VAS/adam_camx/wrfcamx"
-set EMIS    = "/lustre/groups/anenberggrp/VAS/adam_camx/emis_area_out/camx_ready"
+set MET     = "/GWSPH/groups/anenberggrp/camx_mpi/nyc/wrfcamx"
+set EMIS    = "/GWSPH/groups/anenberggrp/camx_mpi/nyc/emis_area_out"
 set PTSRCE  = "/GWSPH/groups/anenberggrp/camx_mpi/nyc/emis_pt_out"
-set OUTPUT  = "/lustre/groups/anenberggrp/srunkel/camx/camx_runs/outputs"
+set OUTPUT  = "/lustre/groups/anenberggrp/srunkel/camx/camx_runs/outputs/${formatted_date}"
 
+mkdir -p $OUTPUT
 #
 #  --- Create the nodes file ---
 set NUMPROCS = 96
 
 set RESTART = "YES"
-foreach today ( 11.05 12.05 13.05 14.05 15.05 16.05 17.05 18.05 19.05 20.05 21.05 22.05 23.05 24.05 25.05 26.05 27.05 28.05 29.05 30.05 31.05 01.06 02.06 03.06 04.06 05.06 06.06 07.06 08.06 09.06 10.06 11.06 12.06 13.06 14.06 15.06 16.06 17.06 18.06 19.06 20.06 21.06 22.06 23.06 24.06 25.06 26.06 27.06 28.06 29.06 30.06 01.07 02.07 03.07 04.07 05.07 06.07 07.07 08.07 09.07 10.07 11.07 12.07 13.07 14.07 15.07 16.07 17.07 18.07 19.07 20.07 21.07 22.07 23.07 24.07 25.07 26.07 27.07 28.07 29.07 30.07 31.07 01.08 02.08 03.08 04.08 05.08 06.08 07.08 08.08 09.08 10.08 11.08 12.08 13.08 14.08 15.08 16.08 17.08 18.08 19.08 20.08 21.08 22.08 23.08 24.08 25.08 26.08 27.08 28.08 29.08 30.08 31.08)
-set MON = $today:e
-set CAL = $today:r
-set CALDAY = 2018${MON}${CAL}
-set CDAY = 18${MON}${CAL}
-if(${CALDAY} == 20180601) then
-	set YESTERDAY = 20180531
-else if(${CALDAY} == 20180701) then
-	set YESTERDAY = 20180630
-else if(${CALDAY} == 20180801) then
-	set YESTERDAY = 20180731
-else
-	set YESTERDAY = `echo ${CALDAY} | awk '{printf("%d",$1-1)}'`
+set start_date = "20180507"
+set end_date = "20181001"
+set startdate = `date -I -d "$start_date"`
+set enddate = `date -I -d "$end_date"`
+if ( "$startdate" == "" || "$enddate" == "" ) then
+    echo "Date conversion failed. Exiting."
+    exit -1
 endif
-echo $CALDAY
-echo $YESTERDAY
 
+set d = "$startdate"
+while ( "$d" != "$enddate" )
+
+# Calculate the YESTERDAY, CALDAY, and CDAY variables
+    set YESTERDAY = `date -d "$d - 1 day" "+%Y%m%d"`
+    set CALDAY = `date -d "$d" "+%Y%m%d"`
+    set CDAY = `date -d "$d" "+%y%m%d"`
+    set MON = `echo "$CALDAY" | cut -c 5-6`
+    set CAL = `echo "$CALDAY" | cut -c 7-8`
+# Print or use the variables as needed
+    echo "YESTERDAY: $YESTERDAY, CALDAY: $CALDAY, CDAY: $CDAY, format: $d"
+
+    # Increment the date
+    set d = `date -d "$d + 1 day"`
 #
 if( ${RESTART} == "NO" ) then
         set RESTART = "false"
@@ -133,19 +141,18 @@ cat << ieof > CAMx.in
 
  Chemistry_Parameters = '$INPUT/CAMx7.2.chemparam.CB6r5',
  Photolysis_Rates     = '$TUV/tuv.do_CB6r5.${CDAY}',
- Ozone_Column         = '$INPUT/o3map.1.33km.${CALDAY}.daily',
+ Ozone_Column         = '$OZCOL/o3map.1.33km.${CALDAY}.daily',
  Initial_Conditions   = '$ICBC/ICON_20180502_icbcprep',
  Boundary_Conditions  = '$ICBC/bc.camx.${CALDAY}',
- Point_Sources(1)     = '$PTSRCE/point.cmv_c3_133.camx.${CALDAY}.bin',
- Point_Sources(2)     = '$PTSRCE/point.cmv_c1c2_133.camx.${CALDAY}.bin',
+ Point_Sources(1)     = '$PTSRCE/point.cmv_c1c2_133.camx.${CALDAY}.bin',
+ Point_Sources(2)     = '$PTSRCE/point.ptnonipm_nosolv_133.camx.${CALDAY}.bin',
  Point_Sources(3)     = '$PTSRCE/point.ptegu_12.camx.${CALDAY}.bin',
  Point_Sources(4)     = '$PTSRCE/point.ptfire_12.camx.${CALDAY}.bin',
- Point_Sources(5)     = '$PTSRCE/point.pt_oilgas_solv_133.camx.${CALDAY}.bin',  
+ Point_Sources(5)     = '$PTSRCE/point.pt_oilgas_solv_133.camx.${CALDAY}.bin',
  Point_Sources(6)     = '$PTSRCE/point.ptagfire_12.camx.${CALDAY}.bin',
- Point_Sources(7)     = '$PTSRCE/point.pt_oilgas_nosolv_133.camx.${CALDAY}.bin',  
+ Point_Sources(7)     = '$PTSRCE/point.pt_oilgas_nosolv_133.camx.${CALDAY}.bin',
  Point_Sources(8)     = '$PTSRCE/point.ptnonipm_solv_133.camx.${CALDAY}.bin',
- Point_Sources(9)     = '$PTSRCE/point.ptnonipm_nosolv_133.camx.${CALDAY}.bin',
-
+ Point_Sources(9)     = '$PTSRCE/point.cmv_c3_133.camx.${CALDAY}.bin',
  Master_Grid_Restart  = '$OUTPUT/CAMx.$RUN.${YESTERDAY}.inst',
  Nested_Grid_Restart  = '$OUTPUT/CAMx.$RUN.${YESTERDAY}.finst',
  PiG_Restart          = ' ',
