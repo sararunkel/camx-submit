@@ -25,8 +25,8 @@ mkdir -p $OUTPUT
 #  --- Create the nodes file ---
 set NUMPROCS = 96
 
-set RESTART = "YES"
-set start_date = "20180507"
+set RESTART = "NO"
+set start_date = "20180502"
 set end_date = "20181001"
 set startdate = `date -I -d "$start_date"`
 set enddate = `date -I -d "$end_date"`
@@ -149,10 +149,10 @@ cat << ieof > CAMx.in
  Point_Sources(3)     = '$PTSRCE/point.ptegu_12.camx.${CALDAY}.bin',
  Point_Sources(4)     = '$PTSRCE/point.ptfire_12.camx.${CALDAY}.bin',
  Point_Sources(5)     = '$PTSRCE/point.pt_oilgas_solv_133.camx.${CALDAY}.bin',
- Point_Sources(6)     = '$PTSRCE/point.ptagfire_12.camx.${CALDAY}.bin',
- Point_Sources(7)     = '$PTSRCE/point.pt_oilgas_nosolv_133.camx.${CALDAY}.bin',
- Point_Sources(8)     = '$PTSRCE/point.ptnonipm_solv_133.camx.${CALDAY}.bin',
- Point_Sources(9)     = '$PTSRCE/point.cmv_c3_133.camx.${CALDAY}.bin',
+ Point_Sources(6)     = '$PTSRCE/point.pt_oilgas_nosolv_133.camx.${CALDAY}.bin',
+ Point_Sources(7)     = '$PTSRCE/point.ptnonipm_solv_133.camx.${CALDAY}.bin',
+ Point_Sources(8)     = '$PTSRCE/point.cmv_c3_133.camx.${CALDAY}.bin',
+ Point_Sources(9)     = '$PTSRCE/point.ptagfire_12.camx.${CALDAY}.bin',
  Master_Grid_Restart  = '$OUTPUT/CAMx.$RUN.${YESTERDAY}.inst',
  Nested_Grid_Restart  = '$OUTPUT/CAMx.$RUN.${YESTERDAY}.finst',
  PiG_Restart          = ' ',
@@ -166,7 +166,7 @@ cat << ieof > CAMx.in
  /
 !-------------------------------------------------------------------------------
 ieof
-
+# Point_Sources(9)     = '$PTSRCE/point.ptagfire_12.camx.${CALDAY}.bin', removed point source
 #
 #  --- Execute the model ---
 #
