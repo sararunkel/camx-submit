@@ -150,3 +150,20 @@
 	cd /GWSPH/groups/anenberggrp/camx_mpi/test
 	sbatch camx_mpi_test.sh
 
+ # Setting up GIT on Pegasus
+ ### Step 1: Create key on Pegasus
+ #### Log into pegasus and from the command line:
+ 	ssh-keygen -t ed25519 -C "[info]"
+ ### Step 2: Upload Key to github
+ #### 1. Log in to your GitHub account.
+
+ #### 2. In the top right corner, click your account image and select Settings.
+ #### 3. Click the SSH and GPG keys section and select the New SSH key button.
+ #### 4. On the Add new SSH Key page, provide a name for your SSH key. Since you can assign multiple keys to your account, give them descriptive names for easier navigation. Make sure to add the public key you have previously generated, not the private one. Copy the key contents to the designated field.
+ ### Step 3: Test the connection
+ #### After adding a new key, test your connection to make sure everything works as it's supposed to. In the Pegasus terminal run the following command:
+ 	ssh -T git@github.com
+ #### Connect the key to SSH agent
+  	eval "$(ssh-agent -s)"
+   	ssh-add ~/.ssh/id_ed25519
+
