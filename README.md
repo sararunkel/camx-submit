@@ -28,11 +28,11 @@
 
 ## Step 3. Compile MPICH3
 
-### Download MPICH3 source code 
+### Download MPICH3 source code into your source directory referred to here as {SRC_DIR}
 
-#### Veronica installed this on her home directory because she was getting an error that couldn't compile something on the shared directory. There is a version now in the shared directory /GWSPH/groups/anenberggroup/camx_mpi/mpich-3.0.4
+#### Install MPICH3 into your build directory referred to here as {BLD_DIR}
 
-	cd /GWSPH/home/vtinney/mpi
+	cd {SRC_DIR}
 	wget https://www.mpich.org/static/downloads/3.0.4/mpich-3.0.4.tar.gz
 
 #### From the command line:
@@ -41,26 +41,20 @@
 	module load netcdf-fortran/4.5.2
 	module load netcdf/4.6.1
 	module load mpiexec/0.84_432
-	csh
-	setenv FC ifort
+	tcsh
+	setenv FC gfortran
 	setenv CC gcc
-
-	setenv FC ifort
-	
-	tar xvzf mpich-3.0.4.tar.gz
-	cd mpich-3.0.4
-	unset F90
-	unset F90FLAGS
-	setenv FC ifort
-	./configure --prefix= /YOUR/INSTALL/DIRECTORY/
+	tar xvzf mpich-3.4.3.tar.gz
+	cd mpich-3.4.3
+	./configure FFLAGS=-fallow-argument-mismatch --prefix= {BLD_DIR}
 	make
 	make install
 
 ### Verify that libraries and executables were built
 
-	ls -l /YOUR/INSTALL/DIRECTORY/lib/libmpich.a
-	ls -l /YOUR/INSTALL/DIRECTORY/lib/libmpl.a
-	ls -l /YOUR/INSTALL/DIRECTORY/bin/mpiexec
+	ls -l {BLD_DIR}/lib/libmpich.a
+	ls -l {BLD_DIR}/lib/libmpl.a
+	ls -l {BLD_DIR}/bin/mpiexec
 
 
 ## Step 4. Load required packages
