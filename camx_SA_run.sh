@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # set output and error output
-#SBATCH --time 70:30:00
+#SBATCH --time 7-00:00:00
 #SBATCH -o /lustre/groups/anenberggrp/srunkel/camx/camx_runs/camx.mpi.nyc.%j.out
 #SBATCH -e /lustre/groups/anenberggrp/srunkel/camx/camx_runs/camx.mpi.nyc.%j.err
 
@@ -21,4 +21,4 @@ module load netcdf/4.6.1
 # Create a file which contains the list of cpu-nodes allocated by slurm for running this job.
 srun hostname > nodes
 
-csh CAMx_ifort.run.job
+csh CAMx_SA.run.job
