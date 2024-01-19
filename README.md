@@ -103,15 +103,6 @@
 	set PTSRCE  = "/GWSPH/groups/anenberggrp/camx_mpi/test/ptsrce"
 	set OUTPUT  = "/GWSPH/groups/anenberggrp/camx_mpi/test/outputs"
 
-#### Change the nodes code (to create nodes.txt) to the nodes you'll be using in your run. This is called the "-hostfile" name in the mpiexec code at the bottom of the runfile. Specify the name of the nodes you are going to allocate. Here I am allocating 4 nodes with one processor each from the debug partition.
-	#  --- Create the nodes file ---
-	#
-	cat << ieof > nodes
-	cpu001:1
-	cpu002:1
-	gpu013:1
-	gpu014:1
-
 #### Under "NUMPROCS" this is the number of processors you are allocating and is the sum of the processors (:1) for the nodes specified above.
 
 	set NUMPROCS = 4
@@ -130,7 +121,7 @@
 
 	# default queue, single node
 	#SBATCH -p debug -N 4
-	#SBATCH --mail-user=vtinney@gwu.edu
+	#SBATCH --mail-user=user@gwu.edu
 	#SBATCH --mail-type=ALL
 
 	#SBATCH -D /GWSPH/groups/anenberggrp/camx_mpi/test/runfiles/
@@ -140,6 +131,8 @@
 	module load intel/parallel_studio_xe/2019.3
 	module load netcdf-fortran/4.5.2
 	module load netcdf/4.6.1
+	
+ 	srun hostname > nodes
 
 	csh CAMx_v7.20.36.12.20160610-11.MPICH3.job
 
